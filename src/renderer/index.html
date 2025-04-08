@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Electron Application</title>
+  <!-- Add FontAwesome CDN -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      display: inline-block;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+
+    #title-section {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    video.small-video {
+      display: inline-block;
+      width: 100px;
+      height: 50px;
+      vertical-align: middle;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    #nav-buttons, #search-bar {
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #url-input {
+      width: 60%;
+      padding: 8px;
+      font-size: 16px;
+      margin-right: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    .navbutton {
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: white;
+      margin-right: 5px;
+    }
+
+    button.is-primary {
+      background-color:  #007bff;
+    }
+
+    button.is-warning {
+      background-color: #ffc107;
+    }
+
+    button.is-text {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    #webview {
+      width: 100%;
+      height: 80vh;
+      margin-top: 2px;
+      border: 1px solid #ccc;
+    }
+
+    #settingsModal, #register-dialog {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      text-align: center;
+    }
+
+    .modal-content h2, .modal-content h3 {
+      margin-top: 0;
+    }
+
+    .modal-content input {
+      width: 90%;
+      padding: 8px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    #image-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+.modal {
+    display: none;
+    position: fixed;
+
+    z-index: 1000;
+    right: 5%; /* Align to the right side */
+    top: 30%;
+    width: 300px; /* Set fixed width for the rectangle */
+    height: 30%; /* Adjust height */
+    transform: translateY(-50%); /* Center vertically */
+    background-color: transparent; /* No background */
+}
+
+
+  .modal-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+  }
+  .close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  #modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 80%;
+  overflow-y: auto;
+}
+
+#modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column; /* Stack content vertically */
+  max-width: 80%;
+  max-height: 80vh; /* Limit the height of the modal */
+  overflow: hidden; /* Hide anything overflowing the modal */
+}
+
+#image-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* Space between images */
+  justify-content: center;
+  overflow-y: auto; /* Make the images scrollable vertically */
+  max-height: 60vh; /* Set the max height of the image container */
+}
+
+#image-container img {
+  margin: 2px;
+  width: 200px; /* Fixed width for all images */
+  height: 200px; /* Fixed height for all images */
+  object-fit: cover; /* Ensures images fill the container without distortion */
+  border-radius: 8px; /* Optional: Adds rounded corners to images */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Optional: Adds shadow for depth */
+  transition: transform 0.3s ease; /* Adds smooth zoom effect */
+}
+
+#image-container img:hover {
+  transform: scale(1.1); /* Zoom in effect when hovering over the image */
+}
+
+
+
+#close-modal {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 30px;
+  color: #333;
+  background: none;
+  border: none;
+}
+
+.close {
+    color: blue; /* Set the color of the close button to blue */
+    font-size: 30px; /* Optional: Adjust the font size */
+    font-weight: bold; /* Optional: Make the text bold */
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    cursor: pointer;
+    transition: color 0.3s ease; /* Optional: Add a transition effect */
+}
+
+.close:hover {
+    color: darkblue; /* Change color on hover */
+}
+
+#close-modal-btn {
+  margin-top: 15px;
+  cursor: pointer;
+}
+
+/*--------------EMAILS---------------*/
+.Chat{
+  height: 3%; 
+  display: flex;
+  width: 399px;
+  margin-left: 5%; 
+  height: 10%;
+  align-items: center;
+  justify-content: center;
+  background-color: #3b82f6;
+  color: white;
+  border-radius: 5%;
+  font-weight: 600;
+  outline: none;
+  border: none;
+     
+}
+.close:hover {
+    color: darkblue; /* Change color on hover */
+    cursor:pointer;
+}
+
+.ChatBox{
+  width: 95%; height: 250px;
+  white-space: pre-wrap;
+  resize: none;
+  margin-left: 19px;
+  margin-top: 2%;
+  background-color: #f0f0f0;
+  border-radius: 5%;
+  color: rgb(0, 0, 0);
+  font-weight: 700;
+  outline: none;
+  border: 1px solid #3b82f6;
+  
+}
+
+/*------------HELP CHAT styling-------------------------*/
+.chat-container {
+    width: 400px;
+    height: 310px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 5px 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    flex: none;
+    
+  }
+
+  .chat-header {
+    background-color: #3b82f6; /* Blue header */
+    color: white;
+    padding: 10px;
+    text-align: center;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+
+  .chat-messages {
+    padding: 1px;
+    
+  }
+
+  .message {
+    background-color: #f0f0f0; /* Light gray message background */
+    padding: 8px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    height: 195px;
+  }
+
+  .chat-input {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ccc;
+    height: 40px;
+    
+  }
+
+  .chat-input input[type="text"] {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    margin-right: 5px;
+  }
+
+  .chat-input button {
+    background-color: #3b82f6; /* Blue button */
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  .chat-actions {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+  }
+
+  .chat-actions button {
+    background-color: #e0e0e0; /* Light gray button */
+    border: 1px solid #ccc;
+    padding: 8px 15px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .chat-container-wrapper {
+    display: flex;
+    flex-direction: column; /* Arrange items vertically */
+}
+
+.CHATBOT {
+    margin-top: 0.5cm;
+    margin-left: 0.5cm; /* Add 1cm gap */
+}
+.HELP_Chat{
+  width: 100%;
+  height: 100%;
+  resize: none;
+  font-weight: 900;
+}
+
+
+  </style>
+</head>
+<body>
+<!-- Webview Navigation Section -->
+<div id="search-bar">
+  <button id="prev-button" style="font-size: 15px; padding: 15px 20px; border: none; border-radius: 25px; background-color: #ff7f50; color: white; cursor: pointer; transition: background-color 0.3s ease, transform 0.2s ease; margin: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);" onmouseover="this.style.backgroundColor='#ff6a3d'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='#ff7f50'; this.style.transform='scale(1)';" onmousedown="this.style.transform='scale(0.98)';" onmouseup="this.style.transform='scale(1)';">
+    <i class="fas fa-arrow-left"></i> <!-- FontAwesome Backward Icon -->
+  </button>
+  
+  <button id="next-button" style="font-size: 15px; padding: 15px 20px; border: none; border-radius: 25px; background-color: #1e90ff; color: white; cursor: pointer; transition: background-color 0.3s ease, transform 0.2s ease; margin: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);" onmouseover="this.style.backgroundColor='#1c86ee'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='#1e90ff'; this.style.transform='scale(1)';" onmousedown="this.style.transform='scale(0.98)';" onmouseup="this.style.transform='scale(1)';">
+    <i class="fas fa-arrow-right"></i> <!-- FontAwesome Forward Icon -->
+  </button>
+  
+  <button id="refresh-button" style="font-size: 15px; padding: 15px 20px; border: none; border-radius: 25px; background-color: #f39c12; color: white; cursor: pointer; transition: background-color 0.3s ease, transform 0.2s ease; margin: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);" onmouseover="this.style.backgroundColor='#f39c12'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='#f39c12'; this.style.transform='scale(1)';" onmousedown="this.style.transform='scale(0.98)';" onmouseup="this.style.transform='scale(1)';">
+    <i class="fas fa-sync-alt"></i> <!-- FontAwesome Refresh Icon -->
+  </button>
+  
+  <input type="text" id="url-input" placeholder="Enter website URL">
+  <button class="navbutton" id="search-button">Search</button>
+  <video class="small-video" autoplay muted loop></video>
+  <button class="navbutton" id="show-Image">
+    showImage
+  </button>
+</div>
+
+  <div id="nav-buttons">
+    <button class="navbutton" id="settingsButton">Settings</button>
+    <button class="navbutton" id="startTestBtn" class="button is-primary">Start Test</button>
+    <button class="navbutton" id="stopBtn" class="button is-warning">End Test</button>
+    <button class="navbutton" id="startRecordButton" class="button is-warning">Start Recording</button>
+    <button class="navbutton" id="stopRecordButton" class="button is-warning">Stop Recording</button>
+    <!-- <button class="navbutton" id="startPollBtn">Start Poll</button>
+    <button class="navbutton" id="startQuizBtn">Start Quizz</button> -->
+ 
+  </div>
+
+  <div style="text-align: center; margin-top: 10px;">
+    <!-- <button class="navbutton" id="startBtn" class="button is-primary">Start</button> -->
+
+    <!-- <button class="navbutton" id="videoSelectBtn" class="button is-text">Get Video Sources</button>
+    <select id="selectMenu"></select> -->
+
+    <!------------------CHAT SECTION------------------->
+    <div style="display: flex;">
+      <webview id="webview" src="https://pragament.github.io/electron_browser_home_page/" style="width: 100%;"></webview>
+      <div class="chat-container-wrapper">
+          <div>
+              <button class="Chat" id="sendApiButton">CHAT</button>
+              <textarea class="ChatBox" name="TextBox" id="responseTextArea"></textarea>
+          </div>
+          <div class="CHATBOT">
+              <div class="chat-container">
+                  <div class="chat-header">Help Chat</div>
+                 
+                      <div class="message">
+                          <textarea class="HELP_Chat" id="helpChatTextArea">
+                              Hello! How can I help you today?
+                          </textarea>
+                      </div>
+                 
+                <!--  <div class="chat-actions">
+                       <button id="faqButton">View FAQs</button>
+                      <button id="customMessageButton">Send Custom Message</button>
+                  </div>-->
+                  <div class="chat-input">
+                      <input type="text" id="userInput" placeholder="Ask me something...">
+                      <button id="sendButton">Send</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <!-- Settings Modal -->
+  <div id="settingsModal">
+    <div class="modal-content" style="background-color: white; padding: 25px; border-radius: 12px; width: 400px; text-align: center; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); font-family: Arial, sans-serif;">
+    
+      <h2 style="color: #333; margin-bottom: 20px;">Enter Your Admission & Computer Number</h2>
+    
+      <label for="admissionno" style="font-size: 14px; font-weight: bold; color: #555; display: block; text-align: left; margin-bottom: 5px;">Admission Number:</label>
+      <input type="text" id="admissionno" placeholder="Enter your Admission Number" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; margin-bottom: 15px;">
+      
+      <label for="computernumber" style="font-size: 14px; font-weight: bold; color: #555; display: block; text-align: left; margin-bottom: 5px;">Computer Number:</label>
+      <input type="text" id="computernumber" placeholder="Enter Your Computer Number" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; margin-bottom: 20px;">
+      
+      <label for="saveFilePath" style="font-size: 14px; font-weight: bold; color: #555; display: block; text-align: left; margin-bottom: 5px;">Save File Path:</label>
+        <div style="display: flex; align-items: center;">
+            
+            <button id="browseFilePath" style="background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; margin-bottom: 20px;">Browse</button>
+        </div>
+      <br>
+      
+      <button id="saveSettings" style="background-color: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; margin-right: 10px;">Save</button>
+      
+      <button id="closeSettings" style="background-color: #dc3545; color: white; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">Close</button>
+    
+    </div>
+  </div>
+<!-- First Modal: Displays all images -->
+<div id="image-modal" style="display: none;">
+ 
+  
+  <!-- Modal Title -->
+  <h2 id="image-modal-title" style="text-align: center; margin-top: 10px;">Select an Image</h2>
+
+  <div id="modal-content">
+    <div id="image-container" style="display: flex; flex-wrap: wrap; justify-content: center;"></div>
+  </div>
+  <button id="close-modal-btn" style="padding: 10px; background-color: red; color: white; border: none; border-radius: 5px;">Close</button>
+</div>
+
+
+
+<!-- Second Modal: Displays selected image with title and description -->
+<div id="imageModal" class="modal" style="display: none;">
+  <span class="close" onclick="document.getElementById('imageModal').style.display='none'">&times;</span>
+  <h2 id="modalTitle"></h2> <!-- Title above the image -->
+  <img class="modal-content" id="modalImage">
+  <p id="modalDescription"></p> <!-- Description below the image -->
+</div>
+
+<!-- Trim Video Modal -->
+<div id="trimVideoModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center;">
+  <div class="modal-content" style="background-color: white; padding: 20px; border-radius: 10px; width: 600px; text-align: center;">
+    <h2>Video Preview</h2>
+    <video id="recordedVideo" controls style="width: 100%; height: auto;"></video>
+    
+    <br><br>
+    <p style="font-size: 16px; color: #555;">Start Time: <span id="startTimeDisplay" style="font-weight: bold;">0</span> seconds</p>
+    
+    <br>
+    
+    <!-- Highlight Name Dropdown -->
+    <label for="highlightNameDropdown" style="font-size: 14px; font-weight: bold; color: #444;">Select Highlight:</label>
+    <select id="highlightNameDropdown" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px;">
+      <option value="adding_shapes">Adding Shapes</option>
+      <option value="grouping_ungrouping">Grouping & Ungrouping</option>
+      <option value="hole_cut_operations">Hole & Cut Operations</option>
+      <option value="resizing_scaling">Resizing & Scaling</option>
+      <option value="rotating_flipping">Rotating & Flipping</option>
+      <option value="aligning_objects">Aligning Objects</option>
+      <option value="duplicating_mirroring">Duplicating & Mirroring</option>
+      <option value="custom_shapes_scribble">Custom Shapes with Scribble Tool</option>
+      <option value="shape_generators">Shape Generators</option>
+      <option value="importing_3d_models">Importing 3D Models</option>
+      <option value="extruding_lofting">Extruding & Lofting</option>
+    </select>
+
+    <br><br>
+
+    <label for="endTimeDropdown" style="font-size: 14px; font-weight: bold; color: #444;">Select Duration:</label>
+    <select id="endTimeDropdown" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px;">
+      <option value="5">5 sec</option>
+      <option value="10">10 sec</option>
+      <option value="15">15 sec</option>
+      <option value="20">20 sec</option>
+      <option value="25">25 sec</option>
+      <option value="30">30 sec</option>
+    </select>    
+
+    <br>
+    <br>
+    <br>
+    <button id="saveTrimButton" style="background-color: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; margin-right: 10px;">Save Highlights</button>
+
+    <button id="finalizeTrimButton" style="background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; margin-right: 10px;">Finalize Video</button>
+
+    <button id="closeTrimModal" style="background-color: #dc3545; color: white; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">Close</button>
+  </div>
+</div>
+
+  <script src="../renderer/js/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <!--<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  const sendApiButton = document.getElementById('sendApiButton');
+  const responseTextArea = document.getElementById('responseTextArea');
+
+  sendApiButton.addEventListener('click', function() {
+    const email_id = 'testuser'; // Replace with actual values
+    const name = 'securepassword'; // Replace with actual values (handle securely!)
+    const Id = 'org123'; // Replace with actual values
+
+    const query = `
+      query GetAllAccountsQuery {
+         getAllOrgs {
+              id
+              name
+              }
+          }
+    `;
+    console.error('before  fetch:');
+    fetch('http://localhost:5006/graphql', { // Replace '/graphql' with your GraphQL endpoint
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        // Add any necessary authentication headers here (replace password).
+      },
+      body: JSON.stringify({ query }),
+    })
+    .then(response => {
+      
+    console.error('1before  fetch:');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      console.log(response);
+      return response.json();
+    })
+    .then(data => {
+      
+    console.error('2before  fetch:');
+    console.log(data);
+      if (data.errors) {
+        responseTextArea.value = JSON.stringify(data.errors, null, 2);
+      } else {
+        responseTextArea.value = JSON.stringify(data.data.getAllAccounts, null, 2);
+      }
+    })
+    .catch(error => {
+      console.error('GraphQL request failed:', error);
+      responseTextArea.value = 'Error: ' + error.message;
+    });
+  });
+});
+    </script>-->
+    <!-- to save the file path -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+  const browseButton = document.getElementById('browseFilePath');
+  const saveFilePathInput = document.getElementById('saveFilePath');
+
+  browseButton.addEventListener('click', function() {
+    // Create an input element of type "file"
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.style.display = 'none'; // Hide the input element
+
+    // Allow directory selection (if supported)
+    fileInput.webkitdirectory = true; // For Chrome and Safari
+    fileInput.directory = true; // Standard property, but not universally supported
+
+    // Listen for file selection changes
+    fileInput.addEventListener('change', function(event) {
+      if (event.target.files && event.target.files.length > 0) {
+        // Get the selected file or directory path
+        const filePath = event.target.files[0].path || event.target.files[0].webkitRelativePath || (fileInput.directory ? event.target.files[0].name : null);
+
+        if (filePath) {
+          saveFilePathInput.value = filePath;
+        }
+      } else if (fileInput.directory && event.target.files && event.target.files.length === 0){
+        //if directory is selected, and no files, get the directory path.
+        const filePath = event.target.files[0].path;
+        if(filePath){
+            saveFilePathInput.value = filePath;
+        }
+
+      }
+    });
+
+    // Trigger the file selection dialog
+    fileInput.click();
+  });
+});
+// ---------------------Chat Box response-------------------------- 
+document.addEventListener('DOMContentLoaded', function() {
+  const sendApiButton = document.getElementById('sendApiButton');
+  const responseTextArea = document.getElementById('responseTextArea');
+
+  sendApiButton.addEventListener('click', async function() {
+    const result = await window.electronAPI.showInputDialog({
+      title: 'Enter Your Name',
+      message: 'Please enter your name:',
+      cancelable: true,
+    });
+
+    if (result.canceled) {
+      responseTextArea.value += "Name input cancelled.\n";
+      responseTextArea.scrollTop = responseTextArea.scrollHeight;
+      return;
+    }
+
+    const name = result.value;
+
+    if (name) {
+      responseTextArea.value += "Loading...\n";
+      responseTextArea.scrollTop = responseTextArea.scrollHeight;
+
+      const apiUrl = `https://expressjs-api-resume-random.onrender.com/resume?name=${encodeURIComponent(name)}`;
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          responseTextArea.value = responseTextArea.value.replace("Loading...\n", "");
+
+          if (data && data.name && data.skills && data.projects) {
+            responseTextArea.value += `Name: ${data.name}\n`;
+            responseTextArea.value += `Skills: ${data.skills.join(', ')}\n`;
+            responseTextArea.value += `Projects: ${data.projects.join(', ')}\n`;
+            responseTextArea.scrollTop = responseTextArea.scrollHeight;
+          } else {
+            responseTextArea.value += "Data format unexpected or data not found.\n";
+            responseTextArea.scrollTop = responseTextArea.scrollHeight;
+          }
+        })
+        .catch(error => {
+          responseTextArea.value = responseTextArea.value.replace("Loading...\n", "");
+          responseTextArea.value += "Error fetching data.\n";
+          responseTextArea.scrollTop = responseTextArea.scrollHeight;
+          console.error('Error fetching JSON:', error);
+        });
+    } else {
+      responseTextArea.value += "No name provided.\n";
+      responseTextArea.scrollTop = responseTextArea.scrollHeight;
+    }
+  });
+});
+
+//-------------- HELP CHAT-------------
+document.addEventListener('DOMContentLoaded', function() {
+    const userInput = document.getElementById('userInput');
+    const sendButton = document.getElementById('sendButton');
+    const helpChatTextArea = document.getElementById('helpChatTextArea');
+
+    sendButton.addEventListener('click', async function() {
+        const message = userInput.value.trim();
+
+        if (message) {
+            // Append user's message to the chat area
+            helpChatTextArea.value += `\nUser: ${message}`;
+            userInput.value = ''; // Clear the input field
+
+            // Add "Loading..." message
+            helpChatTextArea.value += '\nAI: Loading...';
+            helpChatTextArea.scrollTop = helpChatTextArea.scrollHeight; // Scroll down
+
+            try {
+                const response = await fetch('http://localhost:8000/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Remove "Loading..." and add AI's response
+                const loadingIndex = helpChatTextArea.value.lastIndexOf('\nAI: Loading...');
+                if (loadingIndex !== -1) {
+                    helpChatTextArea.value = helpChatTextArea.value.substring(0, loadingIndex) + `\nAI: ${data.reply}`;
+                } else {
+                    helpChatTextArea.value += `\nAI: ${data.reply}`; // Fallback if loading message not found
+                }
+
+            } catch (error) {
+                console.error('Fetch error:', error);
+                // Remove "Loading..." and add error message
+                const loadingIndex = helpChatTextArea.value.lastIndexOf('\nAI: Loading...');
+                if (loadingIndex !== -1) {
+                    helpChatTextArea.value = helpChatTextArea.value.substring(0, loadingIndex) + '\nError: Could not get response.';
+                } else {
+                    helpChatTextArea.value += '\nError: Could not get response.'; // Fallback
+                }
+            }
+
+            // Scroll to the bottom of the chat area
+            helpChatTextArea.scrollTop = helpChatTextArea.scrollHeight;
+        }
+    });
+
+    // Optional: Handle Enter key press in the input field
+    userInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            sendButton.click(); // Trigger the send button click
+        }
+    });
+});
+
+
+
+   // FAQ button functionality
+   /*document.getElementById('faqButton').addEventListener('click', async () => {
+      helpChatTextArea.value = 'Loading...'; // Display loading message
+      helpChatTextArea.scrollTop = helpChatTextArea.scrollHeight; // Auto-scroll to bottom
+
+    setTimeout(async () => { // Set a 3-second timeout
+        try {
+            const response = await fetch('FAQ.json'); // Fetch FAQ.json
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const faqs = await response.json();
+
+            let faqText = '';
+            faqs.forEach(faq => {
+                faqText += `Q: ${faq.id}\n`;
+                faqText += `A: ${faq.Value}\n\n`;
+            }); 
+
+            helpChatTextArea.value = faqText; // Display FAQs in the textarea
+            helpChatTextArea.scrollTop = helpChatTextArea.scrollHeight; // Auto-scroll to bottom
+        } catch (error) {
+            console.error('Error fetching or parsing FAQ.json:', error);
+            helpChatTextArea.value = 'Failed to load FAQs.';
+            helpChatTextArea.scrollTop = helpChatTextArea.scrollHeight; // Auto-scroll in case of error message
+        }
+      }, 1000); // 3000 milliseconds = 3 seconds  
+    });
+    document.getElementById('customMessageButton').addEventListener('click', () => {
+      alert("Custom Message button are not implemented yet");
+    });*/
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,21 @@
+[
+    {
+        "id": "1.What is this application used for?",
+        "Value": "This application appears to be an educational tool, possibly related to 3D design and simulation, as indicated by the Tinkercad projects and the 'Practice Simulating Mechanical Movements' section."
+    },{
+       "id":"2.What is the 'Show Image' button for?" , 
+       "Value":"This button might display a relevant image or visual aid related to the current content or activity."
+    },{
+        "id":"3.What are the 'View FAQs' and 'Send Custom Message' buttons in the chat?" , 
+        "Value":"This button might display a relevant image or visual aid related to the current content or activity."
+     },{
+        "id":"4.How do I access the Tinkercad tutorials?" , 
+        "Value":"This button might display a relevant image or visual aid related to the current content or activity."
+     },{
+        "id":"5.How do I access the chat feature?" , 
+        "Value":"The chat feature is located on the right side of the screen, labeled 'CHAT' and 'Help Chat'."
+     },{
+        "id":"6.What are the video tutorials about?" , 
+        "Value":"The video tutorials demonstrate how to design various objects in Tinkercad, such as a Sessa, a Snowman, Earth Lay, a Windmill, a Simple Key, and a Swing."
+     }
+]

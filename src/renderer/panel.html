@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Electron Application</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex; /* Use flexbox to align webview and panel */
+    }
+
+    #webview-container {
+      flex: 1; /* Allow webview to take remaining space */
+      display: flex;
+      flex-direction: column;
+    }
+
+    #title-section {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    video.small-video {
+      display: inline-block;
+      width: 100px;
+      height: 50px;
+      vertical-align: middle;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    #nav-buttons, #search-bar {
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #url-input {
+      width: 60%;
+      padding: 8px;
+      font-size: 16px;
+      margin-right: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    .navbutton {
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: white;
+      margin-right: 5px;
+    }
+
+    button.is-primary {
+      background-color: #007bff;
+    }
+
+    button.is-warning {
+      background-color: #ffc107;
+    }
+
+    button.is-text {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    #webview {
+      width: 100%;
+      height: 80vh;
+      margin-top: 2px;
+      border: 1px solid #ccc;
+      flex: 1; /* Allow webview to take remaining space */
+    }
+
+    #settingsModal, #register-dialog {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      text-align: center;
+    }
+
+    .modal-content h2, .modal-content h3 {
+      margin-top: 0;
+    }
+
+    .modal-content input {
+      width: 90%;
+      padding: 8px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    #image-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      right: 5%;
+      top: 30%;
+      width: 300px;
+      height: 30%;
+      transform: translateY(-50%);
+      background-color: transparent;
+    }
+
+    .modal-content {
+      margin: auto;
+      display: block;
+      width: 80%;
+      max-width: 700px;
+    }
+
+    .close {
+      position: absolute;
+      top: 15px;
+      right: 35px;
+      color: white;
+      font-size: 40px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      max-width: 80%;
+      overflow-y: auto;
+    }
+
+    #modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      max-width: 80%;
+      max-height: 80vh;
+      overflow: hidden;
+    }
+
+    #image-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      overflow-y: auto;
+      max-height: 60vh;
+    }
+
+    #image-container img {
+      margin: 2px;
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+
+    #image-container img:hover {
+      transform: scale(1.1);
+    }
+
+    #close-modal {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 30px;
+      color: #333;
+      background: none;
+      border: none;
+    }
+
+    .close {
+      color: blue;
+      font-size: 30px;
+      font-weight: bold;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .close:hover {
+      color: darkblue;
+    }
+
+    #close-modal-btn {
+      margin-top: 15px;
+      cursor: pointer;
+    }
+
+    #email-panel {
+      width: 300px;
+      height: 100vh;
+      background-color: #f0f0f0;
+      padding: 10px;
+      box-sizing: border-box;
+      border-left: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div style="display: flex; height: 100vh;">
+    <div id="webview-container" style="flex: 1; display: flex; flex-direction: column;">
+      <div id="search-bar">
+        <button id="prev-button" style="font-size: 15px; padding: 15px 20px; border: none; border-radius: 25px; background-color: #ff7f50; color: white; cursor: pointer; transition: background-color 0.3s ease, transform 0.2s ease; margin: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);" onmouseover="this.style.backgroundColor='#ff6a3d'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='#ff7f50'; this.style.transform='scale(1)';" onmousedown="this.style.transform='scale(0.98)';" onmouseup="this.style.transform='scale(1)';">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <button id="next-button" style="font-size: 20"> nothing </button>
